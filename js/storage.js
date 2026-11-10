@@ -23,6 +23,9 @@ function loadGames(){
     // Older games keep the scoring they were played with: their own lines, scored in VP.
     if(!g.rows) g.rows = (shared[g.scen] || LEGACY_ROWS[g.scen] || presetRows("custom")).map(r=>({...r}));
     if(LEGACY[g.scen]) g.scen = LEGACY[g.scen];
+    // Old Konflikt '47 games use that system's version of their mission, if it has one.
+    if(g.sys==="Konflikt '47" && (!g.scoring || g.legacy) && mission(g.scen)?.system==="Bolt Action" && MISSIONS["k47-"+g.scen])
+      g.scen = "k47-"+g.scen;
     // Old games of a matched mission get a one-off offer to switch to the rulebook scoring.
     if(!g.scoring){ g.scoring = "vp"; g.legacy = mission(g.scen)?.kind === "matched"; }
     if(!g.tb) g.tb = {A:0,B:0};
@@ -37,5 +40,7 @@ window.addEventListener("storage", e=>{
   if(e.key!=="fsc-games") return;
   games = loadGames();
   S = games.find(g=>g.id===S?.id) || null;
+  // Leave an open Edit game setup alone so unsaved edits survive; saving applies them to the fresh copy.
+  if(location.hash==="#edit" && S) return;
   show();
 });

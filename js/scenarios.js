@@ -58,28 +58,28 @@ const MISSIONS = {
   "manhunt":      { name:"Manhunt",      system:"Bolt Action", kind:"story", page:"177",  summary:"Attacker must kill the defender's officer in an assault.", rules:[] },
   "point-defence":{ name:"Point Defence",system:"Bolt Action", kind:"story", page:"178*", summary:"Attacker tries to capture the defender's 3 objectives.", rules:[] },
   "land-grab":    { name:"Land Grab",    system:"Bolt Action", kind:"story", page:"179*", summary:"Both sides push into the neutral and enemy quarters.", rules:[] },
-  "surrounded":   { name:"Surrounded!",  system:"Bolt Action", kind:"story", page:"180*", summary:"Destroy the encircled enemy while preserving your own force.", rules:[] },
+  "surrounded":   { name:"Surrounded!",  system:"Bolt Action", kind:"story", page:"180*", summary:"Destroy the encircled enemy while preserving your own force.", rules:[] }
+};
 
-  // Konflikt '47 (rulebook pp.144–160). Scored the same way as Bolt Action; the rules text differs.
-  "k47-seek-destroy": { name:"Seek and Destroy", system:"Konflikt '47", kind:"matched", roll:1, page:"144*", scoring:"vp", margin:2,
-    rows:[{l:"Enemy unit destroyed",v:1}],
-    summary:"1 VP for each enemy unit destroyed. Win by 2 VP or more, otherwise it's a draw.",
-    rules:["First time playing? Try Seek and Destroy with Edges and Meeting Engagement."] },
-  "k47-key-positions": { name:"Key Positions", system:"Konflikt '47", kind:"matched", roll:2, page:"145", scoring:"majority", tiebreak:true, total:"Objectives held",
-    rows:[{l:"Objectives controlled",v:1,max:7}],
-    summary:"Control more objectives than your opponent at the end to win; otherwise it's a draw.",
+// Konflikt '47 (rulebook pp.144–160). Its matched missions score exactly like their Bolt Action counterparts, so they
+// copy its scoring settings and counter caps; only the page, wording and some counter labels differ.
+function k47From(baId, text, labels={}){
+  const ba = MISSIONS[baId];
+  return { ...ba, system:"Konflikt '47", ...text, rows: ba.rows.map((r,i)=>({...r, l:labels[i] ?? r.l})) };
+}
+Object.assign(MISSIONS, {
+  "k47-seek-destroy": k47From("seek-destroy", { page:"144*",
+    rules:["First time playing? Try Seek and Destroy with Edges and Meeting Engagement."] }),
+  "k47-key-positions": k47From("key-positions", { page:"145",
     rules:["Place D3+4 objectives (1\" markers). Roll off: the high roller places the first, then take turns.",
       "Each objective must be more than 12\" from every other and more than 6\" from any table edge.",
       "If a marker can't be placed legally, put it on top of one already on the table. A doubled-up objective counts as two.",
       "Capture: one of your Infantry or Artillery units ends its movement within 3\" with no enemy unit of any type within 3\".",
-      "An objective stays yours until the enemy captures it back."] },
-  "k47-breakthrough": { name:"Breakthrough", system:"Konflikt '47", kind:"matched", roll:3, page:"145", scoring:"vp", margin:2, tiebreak:true, noFog:true,
-    rows:[{l:"Unit moved off enemy table edge",v:3},{l:"Unit completely in enemy deployment zone",v:1}],
-    summary:"3 VP per unit that leaves via the enemy's table edge, 1 VP per unit completely inside the enemy deployment zone at the end. Win by 2.",
+      "An objective stays yours until the enemy captures it back."] }),
+  "k47-breakthrough": k47From("breakthrough", { page:"145",
     rules:["To leave the table a unit needs a successful Advance or Run order, and all models must reach the enemy's deployment zone edge.",
-      "No reserves. If Fog of War is rolled for deployment type, re-roll it."] },
-  "k47-top-secret": { name:"Top Secret", system:"Konflikt '47", kind:"matched", roll:4, page:"146", scoring:"majority", tiebreak:true, total:"Intelligence",
-    rows:[{l:"Intelligence carried off the table",v:1,max:1,one:true,ends:true}],
+      "No reserves. If Fog of War is rolled for deployment type, re-roll it."] }),
+  "k47-top-secret": k47From("top-secret", { page:"146", total:"Intelligence",
     summary:"Carry the Intelligence off your own table edge to win at once; otherwise it's a draw.",
     rules:["The Intelligence Marker (1\") sits in the centre of the table. It is Impassable but has no effect on line of sight or cover.",
       "Seize it: an Infantry unit with an Advance or Run order ends its move with a model touching it. That model carries it.",
@@ -87,34 +87,31 @@ const MISSIONS = {
       "If the carrying unit is destroyed in an Assault, the winning unit may take it straight away, before its Regroup move.",
       "To escape: an Advance or Run order, with all models reaching your own deployment zone edge.",
       "All units, including Infiltrators, deploy more than 12\" from the marker, except units disembarking from a Transport that has moved close enough, or units with the Fast rule."] },
-  "k47-demolition": { name:"Demolition", system:"Konflikt '47", kind:"matched", roll:5, page:"147*", scoring:"majority", tiebreak:true, total:"Bases destroyed",
-    rows:[{l:"Enemy base destroyed",v:1,max:1,ends:true}],
+    { 0:"Intelligence carried off the table" }),
+  "k47-demolition": k47From("demolition", { page:"147*",
     summary:"Destroy the enemy Base to win at once. If neither Base or both Bases are destroyed, it's a draw.",
     rules:["After deployment is decided, roll off. The loser places their Base in their own zone, up to 20\" from the middle line, then the other player does.",
       "All units, including Infiltrators, deploy more than 12\" from the enemy Base.",
       "At the end of any turn, if a model from one of your Infantry or Artillery units is within 3\" of the enemy Base, it is destroyed. No dice roll is needed, and enemy units nearby don't stop it.",
       "The game ends at the end of the turn in which a Base is destroyed.",
-      "If the game ends with neither Base destroyed, or both destroyed in the same turn, the result is a draw."] },
-  "k47-hold-until-relieved": { name:"Hold Until Relieved", system:"Konflikt '47", kind:"matched", roll:6, page:"147*", scoring:"majority", tiebreak:true, total:"Objective held",
-    rows:[{l:"Holding the Strategic Objective",v:1,max:1,one:true}],
+      "If the game ends with neither Base destroyed, or both destroyed in the same turn, the result is a draw."] }),
+  "k47-hold-until-relieved": k47From("hold-until-relieved", { page:"147*",
     summary:"Whoever controls the Strategic Objective in the centre of the table at the end wins; otherwise it's a draw.",
     rules:["Control: one of your Infantry or Artillery units ends its movement within 3\" with no enemy unit of any type within 3\".",
       "If terrain is used as the objective, agree its rules before the game."] },
-  "k47-grand-tactical": { name:"Grand Tactical (optional)", system:"Konflikt '47", kind:"matched", page:"152*", scoring:"vp", margin:2,
-    rows:[{l:"Enemy unit destroyed",v:1},{l:"Unit in enemy deployment zone",v:1},{l:"Unit moved off enemy table edge",v:3},
-      {l:"Objective controlled",v:3},{l:"Intelligence retrieved",v:5,max:1,one:true},
-      {l:"Enemy base destroyed",v:5,max:1},{l:"Strategic Objective controlled",v:5,max:1,one:true}],
-    summary:"All six missions at once, scored in VP. Win by 2.",
+    { 0:"Holding the Strategic Objective" }),
+  "k47-grand-tactical": k47From("grand-tactical", { page:"152*",
     rules:["Set up all six missions together.",
       "The game does not end when a Base is destroyed or the Intelligence leaves the table.",
       "Reserves may Outflank."] },
+    { 3:"Objective controlled", 4:"Intelligence retrieved", 6:"Strategic Objective controlled" }),
   // Konflikt '47 story missions: hidden until their scoring is added.
   "k47-envelopment":   { name:"Envelopment",   system:"Konflikt '47", kind:"story", page:"155",       summary:"Attacker breaks into the Defender's zone; VP for kills, units in the zone and units off the far edge.", rules:[] },
   "k47-manhunt":       { name:"Manhunt",       system:"Konflikt '47", kind:"story", page:"156*–157*", summary:"Attacker must take out the Defender's Officer in Close Quarters (a Rift unit must be killed).", rules:[] },
   "k47-point-defence": { name:"Point Defence", system:"Konflikt '47", kind:"story", page:"158",       summary:"Attacker tries to capture the Defender's 3 objectives.", rules:[] },
   "k47-land-grab":     { name:"Land Grab",     system:"Konflikt '47", kind:"story", page:"159",       summary:"Both sides push into the neutral and enemy quarters.", rules:[] },
   "k47-surrounded":    { name:"Surrounded!",   system:"Konflikt '47", kind:"story", page:"160*",      summary:"Destroy the encircled enemy while preserving your own force.", rules:[] }
-};
+});
 // The "All missions" rules shown in every mission briefing, per system.
 const GENERAL_RULES = {
   "Bolt Action": { page:"163*, 168", rules:[

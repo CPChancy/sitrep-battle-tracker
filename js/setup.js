@@ -32,7 +32,7 @@ function renderSetupBriefs(){
   $("setupResetWarn").textContent = editing && draft.scen!==S.scen ? "Changing the mission resets this game's counters." : "";
 }
 [["setupA","a"],["setupPA","pa"],["setupB","b"],["setupPB","pb"],["setupPts","pts"],["setupScen","scen"],["setupZones","zones"],["setupDeploy","deploy"]].forEach(([id,k])=>
-  $(id).addEventListener("input", e=>{ draft[k]=e.target.value; if(k==="pts") draft.ptsSet=true; if(["scen","zones","deploy"].includes(k)) renderSetupBriefs(); }));
+  $(id).addEventListener("input", e=>{ draft[k]=e.target.value; if(k==="pts") draft.ptsSet = e.target.value!==""; if(["scen","zones","deploy"].includes(k)) renderSetupBriefs(); }));
 $("setupRoll").onclick = ()=>{
   const r = rollMatched(draft.sys);
   Object.assign(draft, {scen:r.scen, zones:r.zones, deploy:r.deploy});

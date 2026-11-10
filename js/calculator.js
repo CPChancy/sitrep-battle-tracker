@@ -18,8 +18,7 @@ function renderSetup(){
   document.querySelectorAll(".totLabel").forEach(l=>l.textContent = (S.scoring==="majority" && mission(S.scen)?.total) || "Victory points");
   $("legacyNote").hidden = !S.legacy; $("legacyName").textContent = mission(S.scen)?.name || "";
   // Deployment is chosen in setup; here it is shown with its rules, and changed through "Edit game setup".
-  const dep = [DEPLOY_ZONES[S.zones]?.name, DEPLOY_TYPES[S.deploy]?.name].filter(Boolean).join(" · ");
-  $("deployText").textContent = dep || "Not decided yet. Use Edit game setup to choose or roll it.";
+  $("deployText").textContent = deployNames(S, " · ") ||"Not decided yet. Use Edit game setup to choose or roll it.";
   $("fogWarn").textContent = fogWarning(S.scen, S.deploy);
   $("turns").innerHTML = [1,2,3,4,5,6,7].map(t=>`<button type="button" class="${t<=S.turn?"done":""} ${t===7?"t7":""}" data-t="${t}" aria-label="Turn ${t}">${t}</button>`).join("");
 }
@@ -33,6 +32,7 @@ function renderEditor(){
 }
 function renderLines(){
   ensureCounts();
+  const maj = S.scoring==="majority";
   ["A","B"].forEach(p=>{
     // Missions that don't score kills track them separately, only to settle drawn games.
     const tb = mission(S.scen)?.tiebreak ? `<div class="line tb">
@@ -43,7 +43,7 @@ function renderLines(){
         <button type="button" class="plus" data-p="${p}" data-tb="1" aria-label="Add one tie-breaker kill">+</button>
       </div></div>` : "";
     $("lines"+p).innerHTML = rows().map((r,i)=>`<div class="line">
-      <div class="what"><b>${esc(r.l)}</b><small>${r.v} VP each</small></div>
+      <div class="what"><b>${esc(r.l)}</b><small>${maj ? "counts towards the result" : `${r.v} VP each`}</small></div>
       <div class="stepper">
         <button type="button" data-p="${p}" data-i="${i}" data-d="-1" aria-label="Remove one ${esc(r.l)}">−</button>
         <output>${S.counts[p][i]}</output>
@@ -71,7 +71,7 @@ function renderResult(){
   $("scoreline").textContent = `${S.nameA} ${a} – ${b} ${S.nameB}`;
   const who = p => S["player"+p] ? ` (${S["player"+p]})` : "";
   const detail = p => rows().map((r,i)=>S.counts[p][i]?`  ${r.l}: ${S.counts[p][i]} × ${r.v} = ${S.counts[p][i]*r.v}`:null).filter(Boolean).join("\n") || "  (none)";
-  const dep = [DEPLOY_ZONES[S.zones]?.name, DEPLOY_TYPES[S.deploy]?.name].filter(Boolean).join(", ");
+  const dep = deployNames(S, ", ");
   $("report").textContent =
 `**${S.sys} — ${m?m.name:S.scen}** (${S.pts} pts, ${over?`ended turn ${S.turn}`:`turn ${S.turn}`})${dep?`\nDeployment: ${dep}`:""}
 **${S.nameA}**${who("A")} ${a}${unit} vs **${S.nameB}**${who("B")} ${b}${unit}
@@ -105,7 +105,7 @@ document.addEventListener("click", e=>{
 });
 $("editor").addEventListener("input", readEditor);
 $("addRow").onclick = ()=>{ S.rows.push({l:"New objective",v:1}); renderEditor(); renderLines(); changed(); };
-$("resetRows").onclick = ()=>{ S.rows=presetRows(S.scen); S.counts={A:[],B:[]}; renderEditor(); renderLines(); changed(); };
+$("resetRows").onclick = ()=>{ S.rows=presetRows(S.scen); S.counts={A:[],B:[]}; S.tb={A:0,B:0}; renderEditor(); renderLines(); changed(); };
 $("margin").addEventListener("input",e=>{ S.margin=+e.target.value; renderResult(); changed(); });
 ["nameA","nameB"].forEach(id=>$(id).addEventListener("input",e=>{ S[id]=e.target.value||(id==="nameA"?"Your army":"Opponent's army"); renderResult(); changed(); }));
 ["playerA","playerB"].forEach(id=>$(id).addEventListener("input",e=>{ S[id]=e.target.value.trim(); renderResult(); changed(); }));

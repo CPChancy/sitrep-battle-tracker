@@ -85,5 +85,7 @@ const rollRange = r => r.length>1 ? `${r[0]}–${r[r.length-1]}` : `${r[0]}`;
 const deployOptions = (table, selected, sys) => `<option value="">Not decided yet</option>` +
   Object.entries(table).filter(([,d])=>d.system===sys)
     .map(([id,d])=>`<option value="${id}"${id===selected?" selected":""}>${rollRange(d.rolls)} · ${esc(d.name)}</option>`).join("");
+// The chosen deployment as text, e.g. "Quarters · Meeting Engagement"; empty if nothing is chosen.
+const deployNames = (g, sep) => [DEPLOY_ZONES[g.zones]?.name, DEPLOY_TYPES[g.deploy]?.name].filter(Boolean).join(sep);
 // Breakthrough allows no reserves, so Fog of War needs re-rolling.
 const fogWarning = (scen, deploy) => mission(scen)?.noFog && DEPLOY_TYPES[deploy]?.fog ? `${mission(scen).name} doesn't allow Fog of War: re-roll the deployment type.` : "";
