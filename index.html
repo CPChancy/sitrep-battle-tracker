@@ -30,7 +30,7 @@
 
   <div class="screen" data-screen="new" hidden>
     <button type="button" class="back" data-go="menu">← Main menu</button>
-    <button type="button" class="choice" data-go="setup"><b>Create new game</b><small>Answer five quick questions, then start scoring.</small></button>
+    <button type="button" class="choice" data-go="setup"><b>Create new game</b><small>Answer a few quick questions, then start scoring.</small></button>
     <button type="button" class="choice" disabled><b>Create new event</b><small>Coming in a future update.</small></button>
   </div>
 
@@ -41,8 +41,8 @@
   </div>
 
   <div class="screen" data-screen="setup" hidden>
-    <button type="button" class="back" data-go="new">← Back</button>
-    <section class="panel" aria-label="New game setup">
+    <button type="button" class="back" id="setupBack" data-go="new">← Back</button>
+    <section class="panel" aria-label="Game setup questions">
       <form id="setupForm" novalidate>
         <div class="row">
           <div class="field">
@@ -70,15 +70,33 @@
         <div class="row">
           <div class="field">
             <label class="label" for="setupPts">4. How many points is this game?</label>
-            <input id="setupPts" type="number" min="50" step="50" inputmode="numeric">
+            <input id="setupPts" type="number" min="50" step="50" inputmode="numeric" placeholder="Choose a system first">
           </div>
           <div class="field">
             <label class="label" for="setupScen">5. What is the main scenario?</label>
             <select id="setupScen"></select>
+            <div class="btns"><button type="button" class="btn ghost" id="setupRoll">Roll for me</button></div>
+            <p class="note warn" id="setupSysNote"></p>
+            <p class="rolled" id="setupRolled" role="status"></p>
+            <div id="setupBrief"></div>
           </div>
         </div>
+        <div class="row">
+          <div class="field">
+            <label class="label" for="setupZones">6. Deployment zones (optional)</label>
+            <select id="setupZones"></select>
+            <div id="setupZonesBrief"></div>
+          </div>
+          <div class="field">
+            <label class="label" for="setupDeploy">7. Deployment type (optional)</label>
+            <select id="setupDeploy"></select>
+            <p class="err warn" id="setupFogWarn"></p>
+            <div id="setupDeployBrief"></div>
+          </div>
+        </div>
+        <p class="err warn" id="setupResetWarn"></p>
         <p class="err" id="setupErr" role="alert"></p>
-        <div class="btns"><button type="submit" class="btn">Start game</button></div>
+        <div class="btns"><button type="submit" class="btn" id="setupSubmit">Start game</button></div>
       </form>
     </section>
   </div>
@@ -86,38 +104,48 @@
   <div class="screen" data-screen="game" hidden>
   <button type="button" class="back" data-go="menu">← Main menu</button>
 
-  <section class="panel" aria-label="Game setup">
+  <section class="panel notice" id="legacyNote" hidden aria-label="Older scoring">
+    <p class="note"><b>Scored with the old rules.</b> This game uses the scoring it was started with. Switch to the rulebook scoring for <span id="legacyName"></span>? Counters will be reset to 0.</p>
+    <div class="btns">
+      <button type="button" class="btn" id="legacyUpgrade">Switch to rulebook scoring</button>
+      <button type="button" class="btn ghost" id="legacyKeep">Keep as played</button>
+    </div>
+  </section>
+
+  <section class="panel" aria-label="Game details">
     <div class="row">
       <div class="field">
-        <label class="label" for="system">System</label>
-        <div class="seg" id="system" role="group">
-          <button type="button" data-sys="Bolt Action" aria-pressed="true">Bolt Action</button>
-          <button type="button" data-sys="Konflikt '47" aria-pressed="false">Konflikt '47</button>
-        </div>
-      </div>
-      <div class="field">
-        <label class="label" for="scenario">Scenario</label>
-        <select id="scenario"></select>
+        <span class="label">Mission</span>
+        <p class="mission"><b id="missionName"></b> <span class="page" id="gameInfo"></span></p>
+        <div id="brief"></div>
       </div>
     </div>
     <div class="row">
       <div class="field">
-        <label class="label" for="points">Game size (pts)</label>
-        <input id="points" type="number" min="0" step="50" value="1000">
+        <span class="label">Deployment</span>
+        <p class="note" id="deployText"></p>
+        <p class="err warn" id="fogWarn"></p>
+        <div id="zonesBrief"></div>
+        <div id="deployBrief"></div>
       </div>
+    </div>
+    <div class="row">
       <div class="field">
-        <label class="label" for="margin">Margin needed to win</label>
-        <input id="margin" type="number" min="1" step="1" value="1">
+        <span class="label">Turn</span>
+        <div class="turns" id="turns"></div>
+        <p class="note">Turn 7 is dashed: roll at the end of turn 6 to see if it happens.</p>
       </div>
     </div>
-    <div class="field">
-      <span class="label">Turn</span>
-      <div class="turns" id="turns"></div>
-      <p class="note">Turn 7 is dashed: roll at the end of turn 6 to see if it happens.</p>
-    </div>
+    <div class="btns"><button type="button" class="btn ghost" data-go="edit">Edit game setup</button></div>
     <details>
       <summary>Edit this game's scoring</summary>
       <p class="note">Values start from the scenario's preset. Check them against your rulebook or event pack and change anything that differs. Changes apply to this game only.</p>
+      <div class="row">
+        <div class="field" id="marginField">
+          <label class="label" for="margin">Margin needed to win</label>
+          <input id="margin" type="number" min="1" step="1">
+        </div>
+      </div>
       <div id="editor"></div>
       <div class="btns">
         <button type="button" class="btn ghost" id="addRow">Add scoring line</button>
@@ -131,13 +159,13 @@
       <input class="name" id="nameA" type="text" value="Allies" aria-label="Player one army">
       <input class="player" id="playerA" type="text" placeholder="Player name" aria-label="Player one name">
       <div id="linesA"></div>
-      <div class="total"><span class="label">Victory points</span><span id="totA">0</span></div>
+      <div class="total"><span class="label totLabel">Victory points</span><span id="totA">0</span></div>
     </section>
     <section class="army b" aria-label="Player two">
       <input class="name" id="nameB" type="text" value="Axis" aria-label="Player two army">
       <input class="player" id="playerB" type="text" placeholder="Player name" aria-label="Player two name">
       <div id="linesB"></div>
-      <div class="total"><span class="label">Victory points</span><span id="totB">0</span></div>
+      <div class="total"><span class="label totLabel">Victory points</span><span id="totB">0</span></div>
     </section>
   </div>
 
@@ -145,20 +173,6 @@
     <span class="label">Result</span>
     <div class="verdict live" id="verdict">Game in progress</div>
     <div class="score" id="scoreline"></div>
-    <div class="row">
-      <div class="field">
-        <label class="label" for="tpWin">League pts: win</label>
-        <input id="tpWin" type="number" step="0.5" value="3">
-      </div>
-      <div class="field">
-        <label class="label" for="tpDraw">Draw</label>
-        <input id="tpDraw" type="number" step="0.5" value="1">
-      </div>
-      <div class="field">
-        <label class="label" for="tpLoss">Loss</label>
-        <input id="tpLoss" type="number" step="0.5" value="0">
-      </div>
-    </div>
     <pre id="report"></pre>
     <div class="btns">
       <button type="button" class="btn" id="copy">Copy for Discord</button>
@@ -172,6 +186,8 @@
 
 <script src="js/utils.js"></script>
 <script src="js/scenarios.js"></script>
+<script src="js/deployment.js"></script>
+<script src="js/briefing.js"></script>
 <script src="js/storage.js"></script>
 <script src="js/calculator.js"></script>
 <script src="js/saved-games.js"></script>

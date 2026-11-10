@@ -7,7 +7,9 @@ Victory-point tracker for Bolt Action and Konflikt '47.
 - `styles.css` – all of the app's styling
 - `js/` – the app's scripts, loaded in this order:
   - `utils.js` – small shared helpers
-  - `scenarios.js` – preset scoring for each scenario
+  - `scenarios.js` – the missions: how each is scored, its counters, and its rules summary
+  - `deployment.js` – deployment zones and types, their rules, and the "Roll for me" dice
+  - `briefing.js` – the summaries and fold-out briefings for missions and deployment
   - `storage.js` – saving and loading games on the device
   - `calculator.js` – the score calculator screen
   - `saved-games.js` – the saved games list (open and delete)
@@ -36,6 +38,8 @@ Upload the changed files to the repository, then change `VERSION` in `sw.js` (e.
 
 ## Notes
 - Scoring values are editable in the app ("Edit this game's scoring") and apply to that game only.
+- Mission rules and scoring follow the Bolt Action rulebook (pp.162–180) and the Konflikt '47 rulebook (pp.144–160), summarised in `js/scenarios.js` and `js/deployment.js`. Each mission and deployment option is tagged with its system, so setup only offers the chosen system's options. Page numbers marked `*` were inferred, not printed in the source photos; check them against the book. Story missions are in the data but hidden until their scoring is added.
+- New games default to 1,250 pts for Bolt Action and 1,500 pts for Konflikt '47 (set in `DEFAULT_POINTS` in `js/scenarios.js`).
 - Game data is stored on the device only.
 - `index.html` has a security policy (the `Content-Security-Policy` line) that only lets the page load its own files plus Google Fonts. If you add anything from another website later, such as analytics or a different font provider, add its address to that line or the browser will block it.
 - Some browsers apply that policy strictly when `index.html` is opened by double-clicking. If the app looks unstyled or does nothing when opened that way, run it from a local web server or use the hosted GitHub Pages version.

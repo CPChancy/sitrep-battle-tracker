@@ -1,8 +1,8 @@
 // Offline cache for SITREP.
 // Bump VERSION whenever you change any app file so phones pick up the update.
-const VERSION = 'fsc-v7';
+const VERSION = 'fsc-v13';
 const CORE = ['./', './index.html', './styles.css', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png',
-  './js/utils.js', './js/scenarios.js', './js/storage.js', './js/calculator.js',
+  './js/utils.js', './js/scenarios.js', './js/deployment.js', './js/briefing.js', './js/storage.js', './js/calculator.js',
   './js/saved-games.js', './js/setup.js', './js/navigation.js', './js/app.js'];
 
 self.addEventListener('install', e => {
