@@ -10,7 +10,7 @@ function renderGames(){
       <button type="button" class="choice" data-open="${g.id}">
         <b>${esc(g.nameA)} v ${esc(g.nameB)}</b>
         <span class="score">${total("A",g)} – ${total("B",g)}</span>
-        <small>${[g.playerA,g.playerB].some(Boolean) ? esc(`${g.playerA||"?"} v ${g.playerB||"?"}`)+" · " : ""}${esc(g.sys)} · ${esc(g.scen)} · ${g.pts} pts · turn ${g.turn} · last played ${when(g.updated)}</small>
+        <small>${[g.playerA,g.playerB].some(Boolean) ? esc(`${g.playerA||"?"} v ${g.playerB||"?"}`)+" · " : ""}${esc(g.sys)} · ${esc(mission(g.scen)?.name || g.scen)} · ${g.pts} pts · turn ${g.turn} · last played ${when(g.updated)}</small>
       </button>
       <button type="button" class="btn ghost" data-remove="${g.id}" aria-label="Delete ${esc(g.nameA)} v ${esc(g.nameB)}">Delete</button>
     </div>`).join("")

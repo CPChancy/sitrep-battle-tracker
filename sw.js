@@ -1,12 +1,15 @@
 // Offline cache for SITREP.
 // Bump VERSION whenever you change any app file so phones pick up the update.
-const VERSION = 'fsc-v7';
+const VERSION = 'fsc-v15';
 const CORE = ['./', './index.html', './styles.css', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png',
-  './js/utils.js', './js/scenarios.js', './js/storage.js', './js/calculator.js',
+  './js/utils.js', './js/scenarios.js', './js/deployment.js', './js/briefing.js', './js/storage.js', './js/calculator.js',
   './js/saved-games.js', './js/setup.js', './js/navigation.js', './js/app.js'];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(VERSION).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
+  // Download every file fresh, not from the browser's own cache, so a new version never stores old copies.
+  e.waitUntil(caches.open(VERSION)
+    .then(c => c.addAll(CORE.map(url => new Request(url, {cache:'reload'}))))
+    .then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', e => {

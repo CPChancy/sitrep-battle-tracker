@@ -86,9 +86,21 @@ summary{cursor:pointer;font-weight:600}
 .choice[disabled]{cursor:not-allowed;opacity:.55;border-left-color:var(--line)}
 .back{align-self:flex-start;font:inherit;font-weight:600;background:none;border:0;color:var(--muted);padding:4px 0;cursor:pointer}
 #setupForm{display:flex;flex-direction:column;gap:14px}
-@media (max-width:620px){#setupForm .field{flex-basis:100%}}
+@media (max-width:620px){.panel .row > .field{flex-basis:100%}}
 .err{color:var(--b);font-size:.85rem;margin:0;min-height:1.2em}
 .saved{display:grid;grid-template-columns:1fr auto;gap:8px}
 .army .player{font:inherit;font-size:.85rem;color:var(--muted);background:transparent;border:0;border-bottom:1px dashed var(--line);border-radius:0;padding:2px 0}
 #gameList{gap:10px}
 details .btns{margin-top:8px}
+/* Mission briefing: summary line, then rules folded away */
+details.brief{border-top:0;padding-top:4px}
+details.brief summary{font-size:.85rem}
+.brief ul{margin:6px 0 8px;padding-left:18px}
+.brief li{font-size:.85rem;margin-bottom:4px}
+.page{font-family:var(--mono);font-weight:500;font-size:.75rem;color:var(--muted)}
+.line.tb .what b{color:var(--muted)}
+.notice{border-left:4px solid var(--accent)}
+.rolled{font-family:var(--mono);font-size:.8rem;color:var(--accent);margin:0}
+.rolled:empty,.warn:empty{display:none}
+.mission{margin:0;display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px;align-items:baseline}
+.mission b{font-family:var(--display);font-weight:800;font-size:1.3rem;text-transform:uppercase;letter-spacing:.03em}
